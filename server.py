@@ -1,20 +1,26 @@
 from flask import Flask, request, jsonify
 
-# Inicio de la aplicación
 app = Flask(__name__)
+mensajes = []  # Lista para almacenar los mensajes
 
-# Ruta para recibir mensajes de clientes
-@app.route('/')
+@app.route("/", methods=["POST"])
 def recibir_mensaje():
-    # Obtener el mensaje del cliente
-    mensaje = request.form.get("mensaje")
+    """Recibe un mensaje de un cliente y lo retransmite a todos."""
+    data = request.get_json()
+    if "mensaje" in data:
+        mensajes.append(data["mensaje"])
+        respuesta = {
+            "estado": "Mensaje recibido",
+            "mensaje": data["mensaje"],
+            "historial": mensajes  # Enviamos el historial de mensajes
+        }
+        return jsonify(respuesta), 200
+    return jsonify({"error": "Mensaje no recibido"}), 400
 
-    if mensaje:
-        print(f"Mensaje recibido: {mensaje}")
-        return "Mensaje recibido con éxito", 200    
-    else:
-        return "No se recibió ningún mensaje", 400
+@app.route("/", methods=["GET"])
+def obtener_mensajes():
+    """Devuelve todos los mensajes almacenados."""
+    return jsonify({"mensajes": mensajes})
 
-# Ejecutar el servidor en el puerto 5000
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5051)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)

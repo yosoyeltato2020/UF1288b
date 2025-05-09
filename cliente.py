@@ -1,23 +1,16 @@
 import requests
-import json
-SERVER_URL="http://192.168.1.18:5000/message"
+
+url = "http://localhost:8080"
 
 def enviar_mensaje(mensaje):
-    """
-    Funcion para enviar un mensaje a la servidor y recibir una respuesta del servidor
-    """
-    
-    try:
-        data = {"mensaje": mensaje}
+    """Envía un mensaje al servidor y recibe la confirmación."""
+    datos = {"mensaje": mensaje}
+    respuesta = requests.post(url, json=datos)
+    print("Respuesta del servidor:", respuesta.json())
 
-        response = requests.post(SERVER_URL, data=data)
+# Prueba enviando un mensaje
+enviar_mensaje("¡Hola desde el cliente!")
 
-        if response.status_code == 200:
-            print("Mensaje enviado correctamente.")
-            print("Respuesta del servidor:", response.text)
-        else:
-            print("Error al enviar el mensaje. Código de estado:", response.text)
-            
-    except Exception as e:
-        print("Error:", e)
-            
+# Obtener historial de mensajes
+historial_respuesta = requests.get("http://localhost:8080")
+print("Historial de mensajes:", historial_respuesta.json())
